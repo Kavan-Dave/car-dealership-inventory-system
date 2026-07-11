@@ -116,4 +116,19 @@ describe("User Registration", () => {
 
     });
 
+    test("Should reject invalid email format", async () => {
+
+        const user = {
+            name: "Kaviraj",
+            email: "kaviraj@test",
+            password: "123456"
+        };
+
+        const response = await request(app)
+            .post("/api/auth/register")
+            .send(user);
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("Invalid email format");
+    });
+
 });

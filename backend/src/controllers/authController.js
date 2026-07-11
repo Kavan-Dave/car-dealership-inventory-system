@@ -17,13 +17,19 @@ const registerUser = async (req, res) => {
                 message: "Email already exists"
             });
         }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                message: "Invalid email format"
+            });
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
         await User.create({
             name,
             email,
             password : hashedPassword
         });
-
         res.status(201).json({
             message: "User registered successfully"
         });
