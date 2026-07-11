@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../app");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 describe("User Login", () => {
 
@@ -22,6 +23,11 @@ describe("User Login", () => {
             expect(response.body.message).toBe("Login successful");
             expect(response.body.token).toBeDefined();
             expect(typeof response.body.token).toBe("string");
+            const decoded = jwt.verify(
+                response.body.token,
+                process.env.JWT_SECRET
+            );
+        expect(decoded.userId).toBeDefined();
     });
 
     test("should reject login when email does not exist", async () => {
