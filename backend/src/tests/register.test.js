@@ -131,4 +131,24 @@ describe("User Registration", () => {
         expect(response.body.message).toBe("Invalid email format");
     });
 
+    test("should return 500 when database insertion fails", async () => {
+
+        const createSpy = jest
+            .spyOn(User, "create")
+            .mockRejectedValue(new Error("Database Error"));
+
+        const response = await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Kaviraj",
+                email: "db@test.com",
+                password: "123456"
+            });
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body.error).toBe("Database Error");
+
+        createSpy.mockRestore();
+    });
+
 });
