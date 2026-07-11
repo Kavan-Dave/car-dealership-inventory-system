@@ -78,7 +78,14 @@ describe("Vehicle Creation", () => {
             .post("/api/vehicles")
             .set("Authorization", `Bearer ${token}`)
             .send({
-                make: "Toyota"
+                make: "Toyota",
+                model: "Camry",
+                year: 2023,
+                price: 1800000,
+                mileage: 12000,
+                color: "White",
+                fuelType: "Petrol",
+                transmission: "Automatic"
             });
 
         expect(response.statusCode).toBe(500);
@@ -88,4 +95,58 @@ describe("Vehicle Creation", () => {
 
     });
 
+    test("should reject invalid fuel type", async () => {
+
+        const token = jwt.sign(
+            {
+                userId: "123",
+                role: "admin"
+            },
+            process.env.JWT_SECRET
+        );
+
+        const response = await request(app)
+            .post("/api/vehicles")
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                make: "Toyota",
+                model: "Camry",
+                year: 2023,
+                price: 1800000,
+                mileage: 12000,
+                color: "White",
+                fuelType: "Water",
+                transmission: "Automatic"
+            });
+
+        expect(response.statusCode).toBe(400);
+
+        expect(response.body.message)
+            .toBe("Invalid fuel type");
+
+    });
+
+    test("should reject request with missing required fields", async () => {
+
+        const token = jwt.sign(
+            {
+                userId: "123",
+                role: "admin"
+            },
+            process.env.JWT_SECRET
+        );
+
+        const response = await request(app)
+            .post("/api/vehicles")
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                make: "Toyota"
+            });
+
+        expect(response.statusCode).toBe(400);
+
+        expect(response.body.message)
+            .toBe("All vehicle fields are required");
+
+    });
 });
