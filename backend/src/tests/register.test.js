@@ -258,4 +258,23 @@ describe("User Login", () => {
         expect(response.body.message).toBe("Invalid email format");
     });
 
+    test("should return 500 when database query fails during login", async () => {
+
+        const findOneSpy = jest
+            .spyOn(User, "findOne")
+            .mockRejectedValue(new Error("Database Error"));
+
+        const response = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: "john@example.com",
+                password: "Password123"
+            });
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body.error).toBe("Database Error");
+
+        findOneSpy.mockRestore();
+    });
+
 });
