@@ -154,4 +154,22 @@ describe("User Registration", () => {
         createSpy.mockRestore();
     });
 
+    test("should assign salesperson as the default role", async () => {
+
+        await request(app)
+            .post("/api/auth/register")
+            .send({
+                name: "Kaviraj",
+                email: "role@test.com",
+                password: "Password123"
+            });
+
+        const savedUser = await User.findOne({
+            email: "role@test.com"
+        });
+
+        expect(savedUser.role).toBe("salesperson");
+
+    });
+
 });
