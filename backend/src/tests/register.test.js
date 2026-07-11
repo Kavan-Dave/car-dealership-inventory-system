@@ -34,9 +34,57 @@ describe("User Registration", () => {
         const response = await request(app)
             .post("/api/auth/register")
             .send(user);
-        console.log(response.body);
+        // console.log(response.body);
         expect(response.statusCode).toBe(409);
         expect(response.body.message).toBe("Email already exists");
+
+    });
+
+    test("should reject registration when name is missing", async () => {
+
+        const user = {
+            email: "kaviraj@test.com",
+            password: "123456"
+        };
+
+        const response = await request(app)
+            .post("/api/auth/register")
+            .send(user);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("All fields are required");
+
+    });
+
+    test("should reject registration when email is missing", async () => {
+
+        const user = {
+            name: "kaviraj",
+            password: "123456"
+        };
+
+        const response = await request(app)
+            .post("/api/auth/register")
+            .send(user);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("All fields are required");
+
+    });
+
+    test("should reject registration when password is missing", async () => {
+
+        const user = {
+            name : "Kaviraj",
+            email: "kaviraj@test.com"
+        };
+
+        const response = await request(app)
+            .post("/api/auth/register")
+            .send(user);
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("All fields are required");
 
     });
 
