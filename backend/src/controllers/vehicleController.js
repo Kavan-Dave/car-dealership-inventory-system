@@ -81,8 +81,55 @@ const getVehicleById = async (req, res) => {
 
 };
 
+const updateVehicle = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+
+            return res.status(400).json({
+                message: "Invalid vehicle ID"
+            });
+
+        }
+
+        const updatedVehicle = await Vehicle.findByIdAndUpdate(
+            id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!updatedVehicle) {
+
+            return res.status(404).json({
+                message: "Vehicle not found"
+            });
+
+        }
+
+        return res.status(200).json({
+            message: "Vehicle updated successfully",
+            vehicle: updatedVehicle
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message: "Database Error"
+        });
+
+    }
+
+};
+
 module.exports = {
     createVehicle,
     getAllVehicles,
-    getVehicleById
+    getVehicleById,
+    updateVehicle
 };

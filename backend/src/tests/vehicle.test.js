@@ -351,4 +351,49 @@ describe("Vehicle Creation", () => {
             .toBe("Database Error");
 
     });
+
+    test("should update vehicle when valid fields is provided", async () => {
+
+        const token = jwt.sign(
+            {
+                userId: "123",
+                role: "admin"
+            },
+            process.env.JWT_SECRET
+        );
+
+        const vehicle = await Vehicle.create({
+            make: "Toyota",
+            model: "Camry",
+            year: 2023,
+            price: 1800000,
+            mileage: 12000,
+            color: "White",
+            fuelType: "Petrol",
+            transmission: "Automatic"
+        });
+
+        const response = await request(app)
+            .put(`/api/vehicles/${vehicle._id}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                make:"Toyota",
+                model:"Camry",
+                year:2023,
+                price:2100000,
+                mileage:12000,
+                color:"Black",
+                fuelType:"Petrol",
+                transmission:"Automatic"
+        });
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.vehicle.price)
+            .toBe(2100000);
+
+        expect(response.body.vehicle.color)
+            .toBe("Black");
+
+    });
 });
