@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 // console.log(User);
 // console.log(typeof User);
 const registerUser = async (req, res) => {
@@ -16,11 +17,11 @@ const registerUser = async (req, res) => {
                 message: "Email already exists"
             });
         }
-
+        const hashedPassword = await bcrypt.hash(password, 10);
         await User.create({
             name,
             email,
-            password
+            password : hashedPassword
         });
 
         res.status(201).json({

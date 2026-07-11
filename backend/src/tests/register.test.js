@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../app");
-
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 describe("User Registration", () => {
 
     test("should register a new user with valid details", async () => {
@@ -85,6 +86,33 @@ describe("User Registration", () => {
 
         expect(response.statusCode).toBe(400);
         expect(response.body.message).toBe("All fields are required");
+
+    });
+
+    test("should store password in hashed format", async () => {
+
+        const user = {
+            name: "Kaviraj",
+            email: "kaviraj@test.com",
+            password: "123456"
+        };
+
+        await request(app)
+            .post("/api/auth/register")
+            .send(user);
+
+        const savedUser = await User.findOne({
+            email: user.email
+        });
+
+        expect(savedUser.password).not.toBe(user.password);
+
+        const isMatch = await bcrypt.compare(
+            user.password,
+            savedUser.password
+        );
+
+        expect(isMatch).toBe(true);
 
     });
 
