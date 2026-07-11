@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../app");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+
 describe("User Registration", () => {
 
     test("should register a new user with valid details", async () => {
@@ -151,4 +152,23 @@ describe("User Registration", () => {
         createSpy.mockRestore();
     });
 
+});
+
+describe("User Login", () => {
+    test("should login a user with valid credentials", async () => {
+        const hashedPassword = await bcrypt.hash("Password123", 10);
+        await User.create({
+            name: "John Doe",
+            email: "john@example.com",
+            password: hashedPassword
+        });
+        const response = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: "john@example.com",
+                password: "Password123"
+            });
+            expect(response.statusCode).toBe(200);
+            expect(response.body.message).toBe("Login successful");
+    });
 });
