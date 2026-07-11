@@ -27,6 +27,7 @@ describe("User Login", () => {
                 response.body.token,
                 process.env.JWT_SECRET
             );
+        expect(decoded.role).toBe("salesperson");
         expect(decoded.userId).toBeDefined();
     });
 
