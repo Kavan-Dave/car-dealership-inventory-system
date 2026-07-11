@@ -199,4 +199,63 @@ describe("User Login", () => {
             expect(response.statusCode).toBe(401);
             expect(response.body.error).toBe("Invalid password");
     });
+
+    test("should reject login when email is misssing", async () => {
+        const hashedPassword = await bcrypt.hash("Password123", 10);
+        await User.create({
+            name: "John Doe",
+            email: "john@example.com",
+            password: hashedPassword
+        });
+
+        const response = await request(app)
+            .post("/api/auth/login")
+            .send({
+                password: "Password123"
+            });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("All fields are required");
+
+    });
+
+    test("should reject login when password is misssing", async () => {
+        const hashedPassword = await bcrypt.hash("Password123", 10);
+        await User.create({
+            name: "John Doe",
+            email: "john@example.com",
+            password: hashedPassword
+        });
+
+        const response = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: "john@example.com"
+            });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("All fields are required");
+
+    });
+
+    test("Should reject invalid email format", async () => {
+
+        const hashedPassword = await bcrypt.hash("Password123", 10);
+        await User.create({
+            name: "John Doe",
+            email: "john@example.com",
+            password: hashedPassword
+        });
+
+        const response = await request(app)
+            .post("/api/auth/login")
+            .send({
+                email: "john.com",
+                password: "Password123"
+            });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe("Invalid email format");
+    });
+
 });
