@@ -6,10 +6,9 @@ const authenticateUser = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/authorizeRoles");
 const validateVehicle = require("../middleware/vehicleValidation");
 
-const {
-    createVehicle
-} = require("../controllers/vehicleController");
+const {createVehicle,getAllVehicles} = require("../controllers/vehicleController");
 
 router.post("/",authenticateUser,authorizeRoles("admin"),validateVehicle,createVehicle);
+router.get("/",authenticateUser,getAllVehicles);
 
 module.exports = router;

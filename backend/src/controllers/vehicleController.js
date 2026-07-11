@@ -21,6 +21,28 @@ const createVehicle = async (req, res) => {
 
 };
 
+const getAllVehicles = async (req, res) => {
+
+    try {
+
+        const vehicles = await Vehicle.find();
+
+        return res.status(200).json({
+            message: "Vehicles retrieved successfully",
+            vehicles
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message: "Database Error"
+        });
+
+    }
+
+};
+
 module.exports = {
-    createVehicle
+    createVehicle,
+    getAllVehicles
 };

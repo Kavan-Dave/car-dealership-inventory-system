@@ -149,4 +149,97 @@ describe("Vehicle Creation", () => {
             .toBe("All vehicle fields are required");
 
     });
+
+    test("should reject unauthenticated user when fetching vehicles", async () => {
+
+        const response = await request(app)
+            .get("/api/vehicles");
+
+        expect(response.statusCode).toBe(401);
+
+        expect(response.body.message)
+            .toBe("Authorization token required");
+
+    });
+
+    test("should return empty vehicle list", async () => {
+
+        const token = jwt.sign(
+            {
+                userId: "123",
+                role: "salesperson"
+            },
+            process.env.JWT_SECRET
+        );
+
+        const response = await request(app)
+            .get("/api/vehicles")
+            .set("Authorization", `Bearer ${token}`);
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.message)
+            .toBe("Vehicles retrieved successfully");
+
+        expect(response.body.vehicles).toEqual([]);
+
+    });
+
+    test("should return all vehicles", async () => {
+
+        const token = jwt.sign(
+            {
+                userId: "123",
+                role: "salesperson"
+            },
+            process.env.JWT_SECRET
+        );
+
+        await Vehicle.create({
+            make: "Toyota",
+            model: "Camry",
+            year: 2023,
+            price: 1800000,
+            mileage: 12000,
+            color: "White",
+            fuelType: "Petrol",
+            transmission: "Automatic"
+        });
+
+        const response = await request(app)
+            .get("/api/vehicles")
+            .set("Authorization", `Bearer ${token}`);
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.vehicles.length).toBe(1);
+
+        expect(response.body.vehicles[0].make)
+            .toBe("Toyota");
+
+    });
+
+    test("should return 500 when fetching vehicles fails", async () => {
+
+        const token = jwt.sign(
+            {
+                userId: "123",
+                role: "salesperson"
+            },
+            process.env.JWT_SECRET
+        );
+
+        jest.spyOn(Vehicle, "find")
+            .mockRejectedValue(new Error("Database Error"));
+
+        const response = await request(app)
+            .get("/api/vehicles")
+            .set("Authorization", `Bearer ${token}`);
+
+        expect(response.statusCode).toBe(500);
+
+        expect(response.body.message)
+            .toBe("Database Error");
+
+    });
 });
