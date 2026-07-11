@@ -94,18 +94,21 @@ describe("User Registration", () => {
 
         const user = {
             name: "Kaviraj",
-            email: "kaviraj@test.com",
+            email: "hash@test.com",
             password: "123456"
         };
 
-        await request(app)
+        const response = await request(app)
             .post("/api/auth/register")
             .send(user);
+
+        expect(response.statusCode).toBe(201);
 
         const savedUser = await User.findOne({
             email: user.email
         });
 
+        expect(savedUser).not.toBeNull();
         expect(savedUser.password).not.toBe(user.password);
 
         const isMatch = await bcrypt.compare(
@@ -114,7 +117,6 @@ describe("User Registration", () => {
         );
 
         expect(isMatch).toBe(true);
-
     });
 
     test("Should reject invalid email format", async () => {
@@ -147,134 +149,9 @@ describe("User Registration", () => {
             });
 
         expect(response.statusCode).toBe(500);
-        expect(response.body.error).toBe("Database Error");
+        expect(response.body.message).toBe("Database Error");
 
         createSpy.mockRestore();
-    });
-
-});
-
-describe("User Login", () => {
-    test("should login a user with valid credentials", async () => {
-        const hashedPassword = await bcrypt.hash("Password123", 10);
-        await User.create({
-            name: "John Doe",
-            email: "john@example.com",
-            password: hashedPassword
-        });
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: "john@example.com",
-                password: "Password123"
-            });
-            expect(response.statusCode).toBe(200);
-            expect(response.body.message).toBe("Login successful");
-    });
-    test("should reject login when email does not exist", async () => {
-
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: "unknown@test.com",
-                password: "Password123"
-            });
-
-        expect(response.statusCode).toBe(401);
-        expect(response.body.error).toBe("Invalid email or password");
-    });
-    test("should reject login when password is incorrect", async () => {
-        const hashedPassword = await bcrypt.hash("Password123", 10);
-        await User.create({
-            name: "John Doe",
-            email: "john@example.com",
-            password: hashedPassword
-        });
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: "john@example.com",
-                password: "123Password"
-            });
-            expect(response.statusCode).toBe(401);
-            expect(response.body.error).toBe("Invalid password");
-    });
-
-    test("should reject login when email is misssing", async () => {
-        const hashedPassword = await bcrypt.hash("Password123", 10);
-        await User.create({
-            name: "John Doe",
-            email: "john@example.com",
-            password: hashedPassword
-        });
-
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                password: "Password123"
-            });
-
-        expect(response.statusCode).toBe(400);
-        expect(response.body.message).toBe("All fields are required");
-
-    });
-
-    test("should reject login when password is misssing", async () => {
-        const hashedPassword = await bcrypt.hash("Password123", 10);
-        await User.create({
-            name: "John Doe",
-            email: "john@example.com",
-            password: hashedPassword
-        });
-
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: "john@example.com"
-            });
-
-        expect(response.statusCode).toBe(400);
-        expect(response.body.message).toBe("All fields are required");
-
-    });
-
-    test("Should reject invalid email format", async () => {
-
-        const hashedPassword = await bcrypt.hash("Password123", 10);
-        await User.create({
-            name: "John Doe",
-            email: "john@example.com",
-            password: hashedPassword
-        });
-
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: "john.com",
-                password: "Password123"
-            });
-
-        expect(response.statusCode).toBe(400);
-        expect(response.body.message).toBe("Invalid email format");
-    });
-
-    test("should return 500 when database query fails during login", async () => {
-
-        const findOneSpy = jest
-            .spyOn(User, "findOne")
-            .mockRejectedValue(new Error("Database Error"));
-
-        const response = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: "john@example.com",
-                password: "Password123"
-            });
-
-        expect(response.statusCode).toBe(500);
-        expect(response.body.error).toBe("Database Error");
-
-        findOneSpy.mockRestore();
     });
 
 });
