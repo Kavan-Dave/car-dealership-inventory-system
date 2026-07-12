@@ -8,6 +8,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminRoute from "./routes/AdminRoute";
 
 function App() {
   return (
@@ -31,12 +33,22 @@ function App() {
         <Routes>
           {/* Core Layout Routes */}
           <Route path="/" element={<MainLayout />}>
-            <Route index element={<DashboardPage />} />
+            {/* Public authentication routes */}
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
-            <Route path="admin" element={<AdminDashboardPage />} />
+            
+            {/* Protected dashboard and vehicle operations (Salespersons & Admins) */}
+            <Route element={<ProtectedRoute />}>
+              <Route index element={<DashboardPage />} />
+              
+              {/* Restricted Admin control center */}
+              <Route element={<AdminRoute />}>
+                <Route path="admin" element={<AdminDashboardPage />} />
+              </Route>
+            </Route>
+
+            {/* Error fallback routes */}
             <Route path="404" element={<NotFoundPage />} />
-            {/* Fallback all unmatched routes to 404 handler */}
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Route>
         </Routes>
