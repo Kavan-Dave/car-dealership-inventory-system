@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Gauge, Fuel, Settings, Pencil, Trash2, PackagePlus, Loader2 } from "lucide-react";
+import { Gauge, Fuel, Settings, Pencil, Trash2, PackagePlus, Loader2, Bookmark } from "lucide-react";
 
 /**
  * Admin variant of the vehicle card.
- * Exposes management actions: Edit, Restock, and Delete.
+ * Exposes management actions: Edit, Reserve/Unreserve, Restock, and Delete.
  */
-const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock }) => {
+const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock, onReserveToggle }) => {
   const [restocking, setRestocking] = useState(false);
+  const [updatingReserve, setUpdatingReserve] = useState(false);
 
   const {
     make,
@@ -62,6 +63,18 @@ const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock }) => {
     }
   };
 
+  const handleReserve = async () => {
+    if (currentStatus === "Sold") return;
+    try {
+      setUpdatingReserve(true);
+      await onReserveToggle(vehicle);
+    } catch (err) {
+      console.error("Reserve toggle failed:", err);
+    } finally {
+      setUpdatingReserve(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group">
       {/* Card Banner */}
@@ -92,60 +105,87 @@ const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock }) => {
       </div>
 
       {/* Body */}
-      <div className="p-4 flex-grow flex flex-col gap-3">
-        {/* Price and Stock */}
-        <div className="flex justify-between items-baseline">
-          <span className="text-xl font-extrabold text-slate-900 tracking-tight">{formattedPrice}</span>
-          <span className={`text-xs font-bold ${quantity > 0 ? "text-slate-600" : "text-rose-600"}`}>
-            Stock: {quantity}
-          </span>
+      <div className="p-4 flex-grow flex flex-col gap-3 justify-between">
+        <div>
+          {/* Price and Stock */}
+          <div className="flex justify-between items-baseline mb-2">
+            <span className="text-xl font-extrabold text-slate-900 tracking-tight">{formattedPrice}</span>
+            <span className={`text-xs font-bold ${quantity > 0 ? "text-slate-600" : "text-rose-600"}`}>
+              Stock: {quantity}
+            </span>
+          </div>
+
+          {/* Specs */}
+          <div className="grid grid-cols-3 gap-2 border-y border-slate-50 py-3 text-[10px] text-slate-500 font-medium">
+            <div className="flex flex-col items-center gap-1 text-center">
+              <Gauge className="w-3.5 h-3.5 text-slate-400" />
+              <span>{formattedMileage} mi</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center border-x border-slate-50">
+              <Fuel className="w-3.5 h-3.5 text-slate-400" />
+              <span>{fuelType}</span>
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center">
+              <Settings className="w-3.5 h-3.5 text-slate-400" />
+              <span>{transmission}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Specs */}
-        <div className="grid grid-cols-3 gap-2 border-y border-slate-50 py-3 text-[10px] text-slate-500 font-medium">
-          <div className="flex flex-col items-center gap-1 text-center">
-            <Gauge className="w-3.5 h-3.5 text-slate-400" />
-            <span>{formattedMileage} mi</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 text-center border-x border-slate-50">
-            <Fuel className="w-3.5 h-3.5 text-slate-400" />
-            <span>{fuelType}</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 text-center">
-            <Settings className="w-3.5 h-3.5 text-slate-400" />
-            <span>{transmission}</span>
-          </div>
-        </div>
-
-        {/* Admin Action Buttons */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* Admin Action Buttons (2x2 Grid) */}
+        <div className="grid grid-cols-2 gap-2 mt-3 pt-1">
+          {/* Edit Button */}
           <button
             onClick={() => onEdit(vehicle)}
-            className="flex justify-center items-center gap-1 py-2 px-2 border border-slate-200 text-[10px] font-bold rounded-xl text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all cursor-pointer"
+            className="flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all cursor-pointer"
           >
             <Pencil className="w-3.5 h-3.5" />
-            Edit
+            <span>Edit</span>
           </button>
+
+          {/* Reserve / Unreserve Button */}
+          <button
+            onClick={handleReserve}
+            disabled={currentStatus === "Sold" || updatingReserve}
+            className={`flex justify-center items-center gap-1.5 py-2 px-2 border text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 ${
+              currentStatus === "Reserved"
+                ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+            }`}
+          >
+            {updatingReserve ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <>
+                <Bookmark className={`w-3.5 h-3.5 ${currentStatus === "Reserved" ? "fill-amber-700" : ""}`} />
+                <span>{currentStatus === "Reserved" ? "Unreserve" : "Reserve"}</span>
+              </>
+            )}
+          </button>
+
+          {/* Restock Button */}
           <button
             onClick={handleRestock}
             disabled={restocking}
-            className="flex justify-center items-center gap-1 py-2 px-2 border border-slate-200 text-[10px] font-bold rounded-xl text-slate-700 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all cursor-pointer disabled:opacity-50"
+            className="flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all cursor-pointer disabled:opacity-50"
           >
             {restocking ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <>
                 <PackagePlus className="w-3.5 h-3.5" />
-                Restock
+                <span>Restock</span>
               </>
             )}
           </button>
+
+          {/* Delete Button */}
           <button
             onClick={() => onDelete(vehicle)}
-            className="flex justify-center items-center gap-1 py-2 px-2 border border-slate-200 text-[10px] font-bold rounded-xl text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-all cursor-pointer"
+            className="flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-all cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            Delete
+            <span>Delete</span>
           </button>
         </div>
       </div>
