@@ -130,8 +130,12 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-2xl w-full border border-slate-100 shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+      {/* Backdrop overlay */}
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose}></div>
+
+      {/* Modal container */}
+      <div className="bg-white rounded-3xl max-w-4xl w-full border border-slate-100 shadow-2xl relative max-h-[95vh] flex flex-col z-10">
         {/* Header */}
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
           <h3 className="text-lg font-bold text-slate-900">
@@ -163,7 +167,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 name="make"
                 value={formData.make}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.make ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
                 placeholder="e.g. Ford"
@@ -179,7 +183,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 name="model"
                 value={formData.model}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.model ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
                 placeholder="e.g. Mustang"
@@ -195,7 +199,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.year ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
               />
@@ -210,7 +214,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.category ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
                 placeholder="e.g. Coupe, SUV"
@@ -227,7 +231,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 min="0"
                 value={formData.price}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.price ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
                 placeholder="45000"
@@ -244,7 +248,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 min="0"
                 value={formData.mileage}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.mileage ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
                 placeholder="12000"
@@ -260,7 +264,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 name="color"
                 value={formData.color}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.color ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
                 placeholder="Red, Blue, black"
@@ -307,7 +311,7 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 min="0"
                 value={formData.quantity}
                 onChange={handleChange}
-                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-55/20 ${
+                className={`block w-full px-3 py-2 border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all bg-slate-50 ${
                   errors.quantity ? "border-red-300 bg-red-50/20" : "border-slate-200"
                 }`}
               />
@@ -324,7 +328,6 @@ const VehicleFormModal = ({ isOpen, onClose, onSubmit, vehicle = null }) => {
                 className="block w-full px-3 py-2 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
               >
                 <option value="Available">Available</option>
-                <option value="Reserved">Reserved</option>
                 <option value="Sold">Sold</option>
               </select>
             </div>

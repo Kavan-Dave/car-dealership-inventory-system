@@ -123,28 +123,6 @@ const AdminDashboardPage = () => {
     }
   };
 
-  /**
-   * Toggle vehicle status between Available and Reserved.
-   * Uses the reserve endpoint.
-   */
-  const handleReserveToggle = async (vehicle) => {
-    try {
-      const response = await vehicleService.reserve(vehicle._id);
-      const newStatus = response.vehicle.status;
-      toast.success(`Vehicle ${newStatus === "Reserved" ? "reserved" : "unreserved"} successfully!`);
-      setVehicles((prev) =>
-        prev.map((v) =>
-          v._id === vehicle._id
-            ? { ...v, status: newStatus }
-            : v
-        )
-      );
-    } catch (err) {
-      const errMsg = err.response?.data?.message || "Status update failed.";
-      toast.error(errMsg);
-    }
-  };
-
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Admin Panel Header */}
@@ -185,7 +163,7 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* Inventory Stats Summary Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
           <p className="text-2xl font-extrabold text-blue-600">{vehicles.length}</p>
           <p className="text-xs text-slate-500 font-medium mt-0.5">Total Listings</p>
@@ -195,12 +173,6 @@ const AdminDashboardPage = () => {
             {vehicles.filter((v) => v.status === "Available").length}
           </p>
           <p className="text-xs text-slate-500 font-medium mt-0.5">Available</p>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
-          <p className="text-2xl font-extrabold text-amber-600">
-            {vehicles.filter((v) => v.status === "Reserved").length}
-          </p>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">Reserved</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
           <p className="text-2xl font-extrabold text-rose-600">
@@ -224,7 +196,6 @@ const AdminDashboardPage = () => {
               onEdit={handleEdit}
               onDelete={handleDeleteTrigger}
               onRestock={handleRestock}
-              onReserveToggle={handleReserveToggle}
             />
           ))}
         </div>

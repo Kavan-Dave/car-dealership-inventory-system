@@ -37,7 +37,7 @@ const MainLayout = () => {
     <div className="min-h-screen flex flex-col bg-slate-50">
       {/* ── Top Navigation Bar ─────────────────────────────────────── */}
       <nav className="bg-slate-900 text-white shadow-lg sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
             {/* Logo */}
@@ -51,15 +51,17 @@ const MainLayout = () => {
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex items-center space-x-1">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `${navLinkBase} ${isActive ? navLinkActive : navLinkInactive}`
-                }
-              >
-                Dashboard
-              </NavLink>
+              {user && (
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) =>
+                    `${navLinkBase} ${isActive ? navLinkActive : navLinkInactive}`
+                  }
+                >
+                  Dashboard
+                </NavLink>
+              )}
 
               {user?.role === "admin" && (
                 <NavLink
@@ -138,16 +140,18 @@ const MainLayout = () => {
         {/* ── Mobile Drawer ────────────────────────────────────── */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-slate-800 bg-slate-900 animate-fade-in">
-            <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `block ${navLinkBase} ${isActive ? navLinkActive : navLinkInactive}`
-                }
-              >
-                Dashboard
-              </NavLink>
+            <div className="max-w-[1600px] w-full mx-auto px-4 py-4 space-y-1">
+              {user && (
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) =>
+                    `block ${navLinkBase} ${isActive ? navLinkActive : navLinkInactive}`
+                  }
+                >
+                  Dashboard
+                </NavLink>
+              )}
 
               {user?.role === "admin" && (
                 <NavLink
@@ -211,13 +215,13 @@ const MainLayout = () => {
       </nav>
 
       {/* ── Main Content ───────────────────────────────────────────── */}
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <main className="flex-grow w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <Outlet />
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="bg-slate-900 text-slate-500 border-t border-slate-800 py-5 text-center text-xs">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-[1600px] w-full mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-slate-400 font-semibold">
               <Car className="w-4 h-4 text-blue-500" />

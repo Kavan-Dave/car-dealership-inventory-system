@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { Gauge, Fuel, Settings, Pencil, Trash2, PackagePlus, Loader2, Bookmark } from "lucide-react";
+import { Gauge, Fuel, Settings, Pencil, Trash2, PackagePlus, Loader2 } from "lucide-react";
 
 /**
  * Admin variant of the vehicle card.
  * Exposes management actions: Edit, Reserve/Unreserve, Restock, and Delete.
  */
-const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock, onReserveToggle }) => {
+const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock }) => {
   const [restocking, setRestocking] = useState(false);
-  const [updatingReserve, setUpdatingReserve] = useState(false);
 
   const {
     make,
@@ -36,7 +35,6 @@ const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock, onReserveToggl
 
   const statusStyles = {
     Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    Reserved: "bg-amber-50 text-amber-700 border-amber-200",
     Sold: "bg-rose-50 text-rose-700 border-rose-200",
   };
   const badgeStyle = statusStyles[currentStatus] || "bg-slate-50 text-slate-700 border-slate-200";
@@ -63,17 +61,6 @@ const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock, onReserveToggl
     }
   };
 
-  const handleReserve = async () => {
-    if (currentStatus === "Sold") return;
-    try {
-      setUpdatingReserve(true);
-      await onReserveToggle(vehicle);
-    } catch (err) {
-      console.error("Reserve toggle failed:", err);
-    } finally {
-      setUpdatingReserve(false);
-    }
-  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group">
@@ -132,42 +119,22 @@ const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock, onReserveToggl
           </div>
         </div>
 
-        {/* Admin Action Buttons (2x2 Grid) */}
-        <div className="grid grid-cols-2 gap-2 mt-3 pt-1">
+        {/* Admin Action Buttons — 3 equal buttons in one row */}
+        <div className="flex gap-2 mt-3 pt-1">
           {/* Edit Button */}
           <button
             onClick={() => onEdit(vehicle)}
-            className="flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all cursor-pointer"
+            className="flex-1 flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all cursor-pointer"
           >
             <Pencil className="w-3.5 h-3.5" />
             <span>Edit</span>
-          </button>
-
-          {/* Reserve / Unreserve Button */}
-          <button
-            onClick={handleReserve}
-            disabled={currentStatus === "Sold" || updatingReserve}
-            className={`flex justify-center items-center gap-1.5 py-2 px-2 border text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 ${
-              currentStatus === "Reserved"
-                ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
-            }`}
-          >
-            {updatingReserve ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <>
-                <Bookmark className={`w-3.5 h-3.5 ${currentStatus === "Reserved" ? "fill-amber-700" : ""}`} />
-                <span>{currentStatus === "Reserved" ? "Unreserve" : "Reserve"}</span>
-              </>
-            )}
           </button>
 
           {/* Restock Button */}
           <button
             onClick={handleRestock}
             disabled={restocking}
-            className="flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all cursor-pointer disabled:opacity-50"
+            className="flex-1 flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all cursor-pointer disabled:opacity-50"
           >
             {restocking ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -182,7 +149,7 @@ const AdminVehicleCard = ({ vehicle, onEdit, onDelete, onRestock, onReserveToggl
           {/* Delete Button */}
           <button
             onClick={() => onDelete(vehicle)}
-            className="flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-all cursor-pointer"
+            className="flex-1 flex justify-center items-center gap-1.5 py-2 px-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 transition-all cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Delete</span>

@@ -107,27 +107,6 @@ const DashboardPage = () => {
     }
   };
 
-  /**
-   * Toggle vehicle status between Available and Reserved.
-   * Uses the reserve endpoint.
-   */
-  const handleReserveToggle = async (vehicle) => {
-    try {
-      const response = await vehicleService.reserve(vehicle._id);
-      const newStatus = response.vehicle.status;
-      toast.success(`Vehicle ${newStatus === "Reserved" ? "reserved" : "unreserved"} successfully!`);
-      setVehicles((prev) =>
-        prev.map((v) =>
-          v._id === vehicle._id
-            ? { ...v, status: newStatus }
-            : v
-        )
-      );
-    } catch (err) {
-      const errMsg = err.response?.data?.message || "Status update failed.";
-      toast.error(errMsg);
-    }
-  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -187,7 +166,6 @@ const DashboardPage = () => {
                 key={vehicle._id}
                 vehicle={vehicle}
                 onPurchase={() => handlePurchaseTrigger(vehicle)}
-                onReserveToggle={handleReserveToggle}
               />
             ))}
           </div>
