@@ -165,10 +165,74 @@ const deleteVehicle = async (req, res) => {
 
 };
 
+const searchVehicles = async (req, res) => {
+    try {
+
+        const {
+            make,
+            model,
+            category,
+            minPrice,
+            maxPrice
+        } = req.query;
+
+        const query = {};
+
+        if (make) {
+            query.make = {
+                $regex: make,
+                $options: "i"
+            };
+        }
+
+        if (model) {
+            query.model = {
+                $regex: model,
+                $options: "i"
+            };
+        }
+
+        if (category) {
+            query.category = {
+                $regex: category,
+                $options: "i"
+            };
+        }
+
+        if (minPrice || maxPrice) {
+
+            query.price = {};
+
+            if (minPrice) {
+                query.price.$gte = Number(minPrice);
+            }
+
+            if (maxPrice) {
+                query.price.$lte = Number(maxPrice);
+            }
+        }
+
+        const vehicles = await Vehicle.find(query);
+
+        return res.status(200).json({
+            message: "Vehicles retrieved successfully",
+            vehicles
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
+
 module.exports = {
     createVehicle,
     getAllVehicles,
     getVehicleById,
     updateVehicle,
-    deleteVehicle
+    deleteVehicle,
+    searchVehicles
 };
