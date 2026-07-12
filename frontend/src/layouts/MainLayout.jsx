@@ -1,12 +1,15 @@
 import React from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import { Car, Shield, User, LogOut, LogIn, UserPlus } from "lucide-react";
 
 const MainLayout = () => {
-  // Temporary auth state for layout demonstration and UI layout verification
-  const user = null; 
+  const { user, logoutUser } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    console.log("Logout triggered");
+    logoutUser();
+    navigate("/login");
   };
 
   return (
@@ -37,35 +40,45 @@ const MainLayout = () => {
               >
                 Dashboard
               </NavLink>
-              <NavLink
-                to="/admin"
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all ${
-                    isActive
-                      ? "bg-slate-800 text-blue-400"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                  }`
-                }
-              >
-                <Shield className="w-4 h-4" />
-                Admin
-              </NavLink>
+              
+              {/* Only show Admin navigation tab if user has admin privileges */}
+              {user && user.role === "admin" && (
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-all ${
+                      isActive
+                        ? "bg-slate-800 text-blue-400"
+                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    }`
+                  }
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </NavLink>
+              )}
             </div>
 
             {/* User profile / Actions */}
             <div className="flex items-center gap-3">
               {user ? (
                 <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex items-center gap-2 text-sm text-slate-300">
-                    <User className="w-4 h-4" />
-                    <span>{user.name || "User"}</span>
-                    <span className="bg-blue-900/50 text-blue-300 border border-blue-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">
-                      {user.role}
-                    </span>
+                  <div className="flex items-center gap-2 text-sm text-slate-300">
+                    <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-blue-400 font-bold text-xs uppercase">
+                      {user.email ? user.email.substring(0, 2) : "US"}
+                    </div>
+                    <div className="hidden sm:flex flex-col text-left">
+                      <span className="text-xs font-semibold text-slate-100 max-w-[120px] truncate" title={user.email}>
+                        {user.email || "Sales User"}
+                      </span>
+                      <span className="text-[10px] text-blue-400 font-medium capitalize">
+                        {user.role}
+                      </span>
+                    </div>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
                     title="Log Out"
                   >
                     <LogOut className="w-5 h-5" />
