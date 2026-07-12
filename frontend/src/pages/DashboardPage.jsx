@@ -3,18 +3,20 @@ import { useAuth } from "../hooks/useAuth";
 import vehicleService from "../services/vehicleService";
 import VehicleCard from "../components/VehicleCard";
 import VehicleCardSkeleton from "../components/VehicleCardSkeleton";
+import SearchBar from "../components/SearchBar";
 import EmptyState from "../components/EmptyState";
 import toast from "react-hot-toast";
 import { Car, RefreshCw } from "lucide-react";
 
 /**
  * Main Client Dashboard view.
- * Fetches all vehicle listings from backend and displays them in a premium grid.
+ * Fetches all vehicle listings from backend and supports fuzzy, field-based searching.
  */
 const DashboardPage = () => {
   const { user } = useAuth();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchActive, setSearchActive] = useState(false);
 
   // Load vehicles on page render
   const fetchInventory = async (silent = false) => {
@@ -22,6 +24,7 @@ const DashboardPage = () => {
       if (!silent) setLoading(true);
       const data = await vehicleService.getAll();
       setVehicles(data.vehicles || []);
+      setSearchActive(false);
     } catch (error) {
       console.error("Error loading inventory:", error);
       toast.error(error.response?.data?.message || "Failed to load inventory");
@@ -33,6 +36,30 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchInventory();
   }, []);
+
+  /**
+   * Dispatches search query to backend /search route.
+   */
+  const handleSearch = async (searchParams) => {
+    try {
+      setLoading(true);
+      const data = await vehicleService.search(searchParams);
+      setVehicles(data.vehicles || []);
+      setSearchActive(true);
+    } catch (error) {
+      console.error("Search failed:", error);
+      toast.error(error.response?.data?.message || "Search failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Resets active search terms.
+   */
+  const handleClearSearch = () => {
+    fetchInventory();
+  };
 
   /**
    * Dispatches purchase request to backend.
@@ -60,7 +87,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Premium dashboard welcome section */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
@@ -97,6 +124,9 @@ const DashboardPage = () => {
         </div>
       </div>
 
+      {/* Filter and Search Bar integration */}
+      <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
+
       {/* Grid container */}
       <div>
         {loading ? (
@@ -120,9 +150,13 @@ const DashboardPage = () => {
         ) : (
           /* Empty catalog view */
           <EmptyState
-            title="Dealership catalog is empty"
-            description="There are currently no vehicles logged in the dealership inventory."
-            onReset={() => fetchInventory()}
+            title={searchActive ? "No matching cars found" : "Dealership catalog is empty"}
+            description={
+              searchActive
+                ? "Try broadening your search query filters or clearing active inputs."
+                : "There are currently no vehicles logged in the dealership inventory."
+            }
+            onReset={searchActive ? handleClearSearch : () => fetchInventory()}
           />
         )}
       </div>
