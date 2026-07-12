@@ -331,7 +331,8 @@ npm test
 
 ### Tools Used
 
-- **Antigravity (Google DeepMind)** — Primary AI coding assistant used throughout the project.
+- **Antigravity (Google DeepMind)** — Primary AI coding assistant used mainly for the frontend development.
+- **ChatGPT (OpenAI)** — Primary AI coding assistant used for the backend development.
 
 ---
 
