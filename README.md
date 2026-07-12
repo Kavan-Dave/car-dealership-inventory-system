@@ -306,14 +306,24 @@ npm test
 ## Screenshots
 
 > **Login Page** — Clean authentication form with a link to registration.
+> <img width="1908" height="981" alt="image" src="https://github.com/user-attachments/assets/14461811-20f0-4e18-abb5-7cb110cd889d" />
+
 
 > **Salesperson Dashboard** — Full vehicle catalog with status badges, specs, search bar, and purchase actions.
+> <img width="1917" height="967" alt="image" src="https://github.com/user-attachments/assets/88ae39cc-6d43-4894-93fc-7e8acddc06ca" />
+
 
 > **Admin Control Panel** — Stats bar (Total / Available / Sold) with full vehicle management controls.
+> <img width="1917" height="967" alt="image" src="https://github.com/user-attachments/assets/12ed53a9-df9a-4fef-8ff3-fd3b4e965d04" />
+
 
 > **Add Vehicle Modal** — Wide, validated form for creating new inventory listings.
+> <img width="1917" height="970" alt="image" src="https://github.com/user-attachments/assets/952b9439-6299-48b4-bbf9-7e7afbdde9fd" />
 
-> **Purchase Confirmation** — Modal confirmation step before committing a purchase transaction.
+
+> **Purchase pop-up** — Modal confirmation step before committing a purchase transaction.
+><img width="1917" height="972" alt="image" src="https://github.com/user-attachments/assets/52eb571d-6b0b-4553-8026-6acffa025d5d" />
+ 
 
 ---
 
@@ -355,7 +365,9 @@ All commits where AI assistance was used include the co-author trailer:
 ```
 Co-authored-by: Antigravity <assistant@example.com>
 ```
-
+```
+Co-authored-by: Chatgpt <assistant@example.com>
+```
 ---
 
 ## Default Admin Credentials
@@ -383,7 +395,3 @@ This project was built as part of a TDD Kata assessment. All code is original wo
 
 ---
 
-<div align="center">
-  <strong>Built with ❤️ by Kavan Dave</strong><br/>
-  <em>Powered by Node.js · MongoDB · React · Tailwind CSS</em>
-</div>
