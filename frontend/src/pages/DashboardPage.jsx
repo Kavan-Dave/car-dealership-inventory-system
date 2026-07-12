@@ -5,18 +5,23 @@ import VehicleCard from "../components/VehicleCard";
 import VehicleCardSkeleton from "../components/VehicleCardSkeleton";
 import SearchBar from "../components/SearchBar";
 import EmptyState from "../components/EmptyState";
+import PurchaseConfirmModal from "../components/PurchaseConfirmModal";
 import toast from "react-hot-toast";
 import { Car, RefreshCw } from "lucide-react";
 
 /**
  * Main Client Dashboard view.
- * Fetches all vehicle listings from backend and supports fuzzy, field-based searching.
+ * Fetches all vehicle listings from backend, supports searching, and handles purchase order flows.
  */
 const DashboardPage = () => {
   const { user } = useAuth();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
+  
+  // Modal tracking states
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // Load vehicles on page render
   const fetchInventory = async (silent = false) => {
@@ -38,7 +43,7 @@ const DashboardPage = () => {
   }, []);
 
   /**
-   * Dispatches search query to backend /search route.
+   * Dispatches search query to backend.
    */
   const handleSearch = async (searchParams) => {
     try {
@@ -59,6 +64,14 @@ const DashboardPage = () => {
    */
   const handleClearSearch = () => {
     fetchInventory();
+  };
+
+  /**
+   * Triggers the purchase confirmation dialogue.
+   */
+  const handlePurchaseTrigger = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setIsConfirmOpen(true);
   };
 
   /**
@@ -83,6 +96,7 @@ const DashboardPage = () => {
       toast.error(errMsg);
       // Re-fetch database to sync local client state with the server truth
       fetchInventory(true);
+      throw error; // Let modal catch error to stop sub-loader state
     }
   };
 
@@ -143,7 +157,7 @@ const DashboardPage = () => {
               <VehicleCard
                 key={vehicle._id}
                 vehicle={vehicle}
-                onPurchase={handlePurchaseVehicle}
+                onPurchase={() => handlePurchaseTrigger(vehicle)}
               />
             ))}
           </div>
@@ -160,6 +174,14 @@ const DashboardPage = () => {
           />
         )}
       </div>
+
+      {/* Order confirmation step */}
+      <PurchaseConfirmModal
+        isOpen={isConfirmOpen}
+        vehicle={selectedVehicle}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handlePurchaseVehicle}
+      />
     </div>
   );
 };
