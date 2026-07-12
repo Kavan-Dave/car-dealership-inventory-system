@@ -1,15 +1,12 @@
-import React, { useState } from "react";
-import { Gauge, Fuel, Settings, ShoppingCart, Loader2 } from "lucide-react";
+import React from "react";
+import { Gauge, Fuel, Settings, ShoppingCart } from "lucide-react";
 
 /**
  * Premium Vehicle Card component.
  * Displays structural vehicle parameters, status indicators, and handles purchase actions.
  */
 const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
-  const [purchasing, setPurchasing] = useState(false);
-
   const {
-    _id,
     make,
     model,
     year,
@@ -35,7 +32,7 @@ const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
 
   // Determine status color codes
   const isOutOfStock = quantity === 0 || status === "Sold";
-  
+
   const statusStyles = {
     Available: "bg-emerald-50 text-emerald-700 border-emerald-200",
     Reserved: "bg-amber-50 text-amber-700 border-amber-200",
@@ -54,20 +51,15 @@ const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
     hatchback: "from-teal-500 to-emerald-600",
     convertible: "from-pink-500 to-rose-600",
   };
-  
+
   const categoryLower = category ? category.toLowerCase() : "";
   const headerGradient = gradientStyles[categoryLower] || "from-blue-600 to-cyan-500";
 
-  const handlePurchaseClick = async () => {
-    if (isOutOfStock || purchasing) return;
-    try {
-      setPurchasing(true);
-      await onPurchase(_id);
-    } catch (err) {
-      console.error("Purchase handler failed:", err);
-    } finally {
-      setPurchasing(false);
-    }
+  // The parent (DashboardPage) owns the modal and loading state.
+  // onPurchase fires with no args; the vehicle is already closed over in the parent callback.
+  const handlePurchaseClick = () => {
+    if (isOutOfStock) return;
+    onPurchase();
   };
 
   return (
@@ -146,17 +138,11 @@ const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
         {!isAdminView && (
           <button
             onClick={handlePurchaseClick}
-            disabled={isOutOfStock || purchasing}
+            disabled={isOutOfStock}
             className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-xs font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-sm shadow-blue-50 disabled:shadow-none cursor-pointer"
           >
-            {purchasing ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <>
-                <ShoppingCart className="w-4 h-4" />
-                <span>{isOutOfStock ? "Sold Out" : "Purchase"}</span>
-              </>
-            )}
+            <ShoppingCart className="w-4 h-4" />
+            <span>{isOutOfStock ? "Sold Out" : "Purchase"}</span>
           </button>
         )}
       </div>
