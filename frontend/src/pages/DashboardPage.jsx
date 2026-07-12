@@ -109,17 +109,17 @@ const DashboardPage = () => {
 
   /**
    * Toggle vehicle status between Available and Reserved.
-   * Uses the update endpoint to change the status field.
+   * Uses the reserve endpoint.
    */
   const handleReserveToggle = async (vehicle) => {
-    const newStatus = vehicle.status === "Reserved" ? "Available" : "Reserved";
     try {
-      const response = await vehicleService.update(vehicle._id, { ...vehicle, status: newStatus });
+      const response = await vehicleService.reserve(vehicle._id);
+      const newStatus = response.vehicle.status;
       toast.success(`Vehicle ${newStatus === "Reserved" ? "reserved" : "unreserved"} successfully!`);
       setVehicles((prev) =>
         prev.map((v) =>
           v._id === vehicle._id
-            ? { ...v, status: response.vehicle.status }
+            ? { ...v, status: newStatus }
             : v
         )
       );

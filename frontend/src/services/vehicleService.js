@@ -94,6 +94,16 @@ export const vehicleService = {
     const response = await axiosInstance.post(`/vehicles/${id}/restock`);
     return response.data;
   },
+
+  /**
+   * Toggles the reservation status of a vehicle.
+   * @param {string} id - Vehicle ID
+   * @returns {Promise<object>} Response and updated vehicle document
+   */
+  reserve: async (id) => {
+    const response = await axiosInstance.post(`/vehicles/${id}/reserve`);
+    return response.data;
+  },
 };
 
 export default vehicleService;

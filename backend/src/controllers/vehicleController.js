@@ -236,10 +236,7 @@ const purchaseVehicle = async (req, res) => {
 
         vehicle.quantity -= 1;
 
-        // Auto-update availability state if no inventory remains
-        if (vehicle.quantity === 0) {
-            vehicle.status = "Sold";
-        }
+        vehicle.status = "Sold";
 
         await vehicle.save();
 
@@ -300,6 +297,45 @@ const restockVehicle = async (req, res) => {
     }
 };
 
+/**
+ * Toggles the reservation status of a vehicle.
+ * Salesperson can use this.
+ */
+const toggleReserveVehicle = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid vehicle ID"
+            });
+        }
+
+        const vehicle = await Vehicle.findById(id);
+        if (!vehicle) {
+            return res.status(404).json({
+                message: "Vehicle not found"
+            });
+        }
+
+        if (vehicle.status === "Sold") {
+            return res.status(400).json({ message: "Cannot reserve a sold vehicle" });
+        }
+
+        vehicle.status = vehicle.status === "Reserved" ? "Available" : "Reserved";
+        await vehicle.save();
+
+        return res.status(200).json({
+            message: `Vehicle ${vehicle.status === "Reserved" ? "reserved" : "unreserved"} successfully`,
+            vehicle
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     createVehicle,
     getAllVehicles,
@@ -308,5 +344,6 @@ module.exports = {
     deleteVehicle,
     searchVehicles,
     purchaseVehicle,
-    restockVehicle
+    restockVehicle,
+    toggleReserveVehicle
 };
