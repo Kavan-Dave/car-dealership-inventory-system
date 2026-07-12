@@ -40,6 +40,13 @@ const DashboardPage = () => {
 
   useEffect(() => {
     fetchInventory();
+
+    // Auto-refresh catalog every 5 seconds to keep client synced with other salespersons/admins
+    const interval = setInterval(() => {
+      fetchInventory(true);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   /**
@@ -97,6 +104,28 @@ const DashboardPage = () => {
       // Re-fetch database to sync local client state with the server truth
       fetchInventory(true);
       throw error; // Let modal catch error to stop sub-loader state
+    }
+  };
+
+  /**
+   * Toggle vehicle status between Available and Reserved.
+   * Uses the update endpoint to change the status field.
+   */
+  const handleReserveToggle = async (vehicle) => {
+    const newStatus = vehicle.status === "Reserved" ? "Available" : "Reserved";
+    try {
+      const response = await vehicleService.update(vehicle._id, { ...vehicle, status: newStatus });
+      toast.success(`Vehicle ${newStatus === "Reserved" ? "reserved" : "unreserved"} successfully!`);
+      setVehicles((prev) =>
+        prev.map((v) =>
+          v._id === vehicle._id
+            ? { ...v, status: response.vehicle.status }
+            : v
+        )
+      );
+    } catch (err) {
+      const errMsg = err.response?.data?.message || "Status update failed.";
+      toast.error(errMsg);
     }
   };
 
@@ -158,6 +187,7 @@ const DashboardPage = () => {
                 key={vehicle._id}
                 vehicle={vehicle}
                 onPurchase={() => handlePurchaseTrigger(vehicle)}
+                onReserveToggle={handleReserveToggle}
               />
             ))}
           </div>

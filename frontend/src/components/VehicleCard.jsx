@@ -1,11 +1,13 @@
-import React from "react";
-import { Gauge, Fuel, Settings, ShoppingCart } from "lucide-react";
+import React, { useState } from "react";
+import { Gauge, Fuel, Settings, ShoppingCart, Bookmark, Loader2 } from "lucide-react";
 
 /**
  * Premium Vehicle Card component.
- * Displays structural vehicle parameters, status indicators, and handles purchase actions.
+ * Displays structural vehicle parameters, status indicators, and handles purchase / reservation actions.
  */
-const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
+const VehicleCard = ({ vehicle, onPurchase, onReserveToggle, isAdminView = false }) => {
+  const [updatingReserve, setUpdatingReserve] = useState(false);
+
   const {
     make,
     model,
@@ -56,10 +58,21 @@ const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
   const headerGradient = gradientStyles[categoryLower] || "from-blue-600 to-cyan-500";
 
   // The parent (DashboardPage) owns the modal and loading state.
-  // onPurchase fires with no args; the vehicle is already closed over in the parent callback.
   const handlePurchaseClick = () => {
     if (isOutOfStock) return;
     onPurchase();
+  };
+
+  const handleReserveClick = async () => {
+    if (currentStatus === "Sold") return;
+    try {
+      setUpdatingReserve(true);
+      await onReserveToggle(vehicle);
+    } catch (err) {
+      console.error("Reservation toggle click error:", err);
+    } finally {
+      setUpdatingReserve(false);
+    }
   };
 
   return (
@@ -134,18 +147,40 @@ const VehicleCard = ({ vehicle, onPurchase, isAdminView = false }) => {
           </div>
         </div>
 
-        {/* Action Button */}
+        {/* Action Buttons */}
         {!isAdminView && (
-          <button
-            onClick={handlePurchaseClick}
-            disabled={isOutOfStock}
-            className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-xs font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-sm shadow-blue-50 disabled:shadow-none cursor-pointer"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            <span>{isOutOfStock ? "Sold Out" : "Purchase"}</span>
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handlePurchaseClick}
+              disabled={isOutOfStock}
+              className="flex-grow flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent text-xs font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-sm shadow-blue-50 disabled:shadow-none cursor-pointer"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span>{isOutOfStock ? "Sold Out" : "Purchase"}</span>
+            </button>
+            <button
+              onClick={handleReserveClick}
+              disabled={currentStatus === "Sold" || updatingReserve}
+              className={`px-3 py-2.5 border text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 ${
+                currentStatus === "Reserved"
+                  ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+              }`}
+              title={currentStatus === "Reserved" ? "Unreserve vehicle" : "Reserve vehicle"}
+            >
+              {updatingReserve ? (
+                <Loader2 className="w-4.5 h-4.5 animate-spin" />
+              ) : (
+                <>
+                  <Bookmark className={`w-4 h-4 ${currentStatus === "Reserved" ? "fill-amber-700" : ""}`} />
+                  <span>{currentStatus === "Reserved" ? "Unreserve" : "Reserve"}</span>
+                </>
+              )}
+            </button>
+          </div>
         )}
       </div>
+
     </div>
   );
 };

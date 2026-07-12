@@ -14,7 +14,7 @@ router.get("/search",authenticateUser,searchVehicles);
 router.post("/:id/purchase",authenticateUser,purchaseVehicle);
 router.post("/:id/restock",authenticateUser,authorizeRoles("admin"),restockVehicle);
 router.get("/:id",authenticateUser,getVehicleById);
-router.put("/:id",authenticateUser,authorizeRoles("admin"),validateVehicle,updateVehicle);
+router.put("/:id",authenticateUser,authorizeRoles("admin", "salesperson"),validateVehicle,updateVehicle);
 router.delete("/:id",authenticateUser,authorizeRoles("admin"),deleteVehicle);
 
 module.exports = router;

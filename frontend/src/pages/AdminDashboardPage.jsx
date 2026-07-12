@@ -39,6 +39,13 @@ const AdminDashboardPage = () => {
 
   useEffect(() => {
     fetchInventory();
+
+    // Auto-refresh stats every 5 seconds to keep client in sync with other salesperson sessions
+    const interval = setInterval(() => {
+      fetchInventory(true);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Open the Add form (empty vehicle = create mode)
