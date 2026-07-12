@@ -1,4 +1,4 @@
-const authorizeRoles = require("../middleware/authorizeRoles");
+const authorizeRoles = require("../../middleware/authorizeRoles");
 
 describe("Authorization Middleware", () => {
 

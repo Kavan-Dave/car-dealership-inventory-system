@@ -1,7 +1,7 @@
 const request = require("supertest");
-const app = require("../app");
+const app = require("../../app");
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
+const User = require("../../models/User");
 
 describe("User Registration", () => {
 
