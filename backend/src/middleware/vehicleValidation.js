@@ -1,5 +1,9 @@
+/**
+ * Request body validator middleware for vehicle creation and update operations.
+ * Validates presence of mandatory properties, sanitizes input formats, and enforces business
+ * rules such as non-negative numeric constraints for price and mileage.
+ */
 const validateVehicle = (req, res, next) => {
-
     const {
         make,
         model,
@@ -11,6 +15,8 @@ const validateVehicle = (req, res, next) => {
         transmission
     } = req.body;
 
+    // Checks presence of all required fields. Explicitly matches price/mileage against undefined
+    // because a price of 0 or mileage of 0 are falsy in JS but logically valid numbers.
     if (
         !make ||
         !model ||
@@ -26,6 +32,7 @@ const validateVehicle = (req, res, next) => {
         });
     }
 
+    // Restrict fuel type selection to options allowed by the data model
     const validFuelTypes = [
         "Petrol",
         "Diesel",
@@ -39,6 +46,7 @@ const validateVehicle = (req, res, next) => {
         });
     }
 
+    // Restrict transmission options to standard types to maintain inventory purity
     const validTransmission = [
         "Manual",
         "Automatic"
@@ -50,12 +58,14 @@ const validateVehicle = (req, res, next) => {
         });
     }
 
+    // Business rule: Financial transaction fields cannot record negative values
     if (price < 0) {
         return res.status(400).json({
             message: "Price cannot be negative"
         });
     }
 
+    // Business rule: Mechanical metrics cannot represent negative values
     if (mileage < 0) {
         return res.status(400).json({
             message: "Mileage cannot be negative"
@@ -63,7 +73,6 @@ const validateVehicle = (req, res, next) => {
     }
 
     next();
-
 };
 
 module.exports = validateVehicle;
