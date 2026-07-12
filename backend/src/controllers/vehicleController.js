@@ -228,11 +228,59 @@ const searchVehicles = async (req, res) => {
     }
 };
 
+const purchaseVehicle = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid vehicle ID"
+            });
+        }
+
+        const vehicle = await Vehicle.findById(id);
+
+        if (!vehicle) {
+            return res.status(404).json({
+                message: "Vehicle not found"
+            });
+        }
+
+        if (vehicle.quantity === 0) {
+            return res.status(400).json({
+                message: "Vehicle is out of stock"
+            });
+        }
+
+        vehicle.quantity -= 1;
+
+        if (vehicle.quantity === 0) {
+            vehicle.status = "Sold";
+        }
+
+        await vehicle.save();
+
+        return res.status(200).json({
+            message: "Vehicle purchased successfully",
+            vehicle
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
+
 module.exports = {
     createVehicle,
     getAllVehicles,
     getVehicleById,
     updateVehicle,
     deleteVehicle,
-    searchVehicles
+    searchVehicles,
+    purchaseVehicle
 };
